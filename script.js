@@ -1,12 +1,56 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("buttonCalculate").addEventListener("click", function () {
-        
-        let peso = parseFloat(document.getElementById("peso").value);
-        let altura = parseFloat(document.getElementById("altura").value);
+    const botaoCalcular = document.getElementById("buttonCalculate");
+    const alturaInput = document.getElementById("altura");
+    const pesoInput = document.getElementById("peso");
+
+    botaoCalcular.addEventListener("click", calcularIMC);
+
+    document.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            botaoCalcular.click();
+        }
+    });
+
+    alturaInput.addEventListener("input", function () {
+        let valor = alturaInput.value.replace(/[^0-9,]/g, "");
+        valor = valor.replace(",", ".");
+
+        if (valor.length >= 3 && !valor.includes(".")) {
+            valor = valor.slice(0, 1) + "." + valor.slice(1);
+        }
+
+        alturaInput.value = valor;
+    });
+
+    pesoInput.addEventListener("input", function () {
+        let valor = pesoInput.value.replace(/[^0-9.]/g, "");
+
+        let partes = valor.split(".");
+        if (partes.length > 2) {
+            valor = partes[0] + "." + partes.slice(1).join("");
+        }
+
+        pesoInput.value = valor;
+    });
+
+    function calcularIMC() {
+        let peso = parseFloat(pesoInput.value);
+        let altura = parseFloat(alturaInput.value);
         let resultado = document.getElementById("containerResult");
 
         if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) {
-            resultado.innerHTML = "<p style='color: red;'>Por favor, insira valores válidos!</p>";
+            resultado.innerHTML = "<p id='textInvalidValues' class='fade-effect'>Por favor, insira valores válidos!</p>";
+
+            let mensagemErro = document.getElementById("textInvalidValues");
+
+            setTimeout(() => {
+                mensagemErro.style.opacity = "0";
+            }, 1500);
+
+            setTimeout(() => {
+                resultado.innerHTML = "";
+            }, 2000);
+
             return;
         }
 
@@ -38,9 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         resultado.innerHTML = `
-            <p class="imcResult" >Seu IMC é <strong style="color: ${cor};">${imc.toFixed(2)}</strong></p>
-            <p class="imcResult" >Classificação: <strong style="color: ${cor};">${classificacao}</strong></p>
-            <p class="imcResult" >Grau de Obesidade: <strong style="color: ${cor};">${obesidade}</strong></p>
+            <p class="imcResult">Seu IMC é <strong style="color: ${cor};">${imc.toFixed(2)}</strong></p>
+            <p class="imcResult">Classificação: <strong style="color: ${cor};">${classificacao}</strong></p>
+            <p class="imcResult">Grau de Obesidade: <strong style="color: ${cor};">${obesidade}</strong></p>
         `;
-    });
+    }
 });
